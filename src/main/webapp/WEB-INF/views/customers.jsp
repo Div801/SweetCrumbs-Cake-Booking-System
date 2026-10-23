@@ -68,17 +68,43 @@
                     <th>Customer Name</th>
                     <th>Email Address</th>
                     <th>Phone Number</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <% for (com.sweetcrumbs.model.Customer customer : customers) { %>
-                    <tr>
-                        <td><span class="customer-id">#<%= customer.getId() %></span></td>
-                        <td class="customer-name"><%= customer.getName() %></td>
-                        <td><%= customer.getEmail() %></td>
-                        <td><%= customer.getPhone() %></td>
-                    </tr>
-                <% } %>
+
+<% for (com.sweetcrumbs.model.Customer customer : customers) { %>
+    <tr>
+        <td>
+            <span class="customer-id">#<%= customer.getId() %></span>
+        </td>
+        <td class="customer-name"><%= customer.getName() %></td>
+        <td><%= customer.getEmail() %></td>
+        <td><%= customer.getPhone() %></td>
+
+        <td class="customer-actions">
+            <a class="edit-btn"
+               href="${pageContext.request.contextPath}/customers/edit?id=<%= customer.getId() %>">
+                Edit
+            </a>
+
+            <form action="${pageContext.request.contextPath}/customers/delete"
+                  method="post"
+                  style="display: inline;"
+                  onsubmit="return confirm('Are you sure you want to delete this customer?');">
+
+                <input type="hidden"
+                       name="id"
+                       value="<%= customer.getId() %>">
+
+                <button type="submit" class="delete-btn">
+                    Delete
+                </button>
+            </form>
+        </td>
+    </tr>
+<% } %>
+
             </tbody>
         </table>
     </div>

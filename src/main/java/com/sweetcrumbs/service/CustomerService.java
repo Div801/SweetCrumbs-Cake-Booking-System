@@ -64,4 +64,33 @@ public class CustomerService {
 
         return null;
     }
+
+
+    // Update an existing customer
+    public boolean updateCustomer(Customer customer)
+            throws IOException {
+
+        // Check whether the email belongs to another customer
+        List<Customer> customers = fileHandler.readCustomers();
+
+        for (Customer existing : customers) {
+            if (existing.getId() != customer.getId()
+                    && existing.getEmail().equalsIgnoreCase(
+                    customer.getEmail())) {
+                throw new IllegalArgumentException(
+                        "Email already registered."
+                );
+            }
+        }
+
+        return fileHandler.updateCustomer(customer);
+    }
+
+    // Delete a customer by ID
+    public boolean deleteCustomer(int id)
+            throws IOException {
+
+        return fileHandler.deleteCustomer(id);
+    }
+
 }
