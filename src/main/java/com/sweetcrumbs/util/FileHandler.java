@@ -73,5 +73,69 @@ public class FileHandler {
 
         return customers;
     }
+
+    // Update an existing customer
+    public boolean updateCustomer(Customer updatedCustomer)
+            throws IOException {
+
+        List<Customer> customers = readCustomers();
+        boolean found = false;
+
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getId() == updatedCustomer.getId()) {
+                customers.set(i, updatedCustomer);
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            writeAllCustomers(customers);
+        }
+
+        return found;
+    }
+
+    // Delete a customer by ID
+    public boolean deleteCustomer(int id) throws IOException {
+
+        List<Customer> customers = readCustomers();
+
+        boolean removed = customers.removeIf(
+                customer -> customer.getId() == id
+        );
+
+        if (removed) {
+            writeAllCustomers(customers);
+        }
+
+        return removed;
+    }
+
+    // Rewrite the file with the current customer records
+    private void writeAllCustomers(List<Customer> customers)
+            throws IOException {
+
+        Files.createDirectories(CUSTOMER_FILE.getParent());
+
+        List<String> lines = new ArrayList<>();
+
+        for (Customer customer : customers) {
+            String line = customer.getId() + "|"
+                    + customer.getName() + "|"
+                    + customer.getEmail() + "|"
+                    + customer.getPhone();
+
+            lines.add(line);
+        }
+
+        Files.write(
+                CUSTOMER_FILE,
+                lines,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+        );
+    }
+
 }
 

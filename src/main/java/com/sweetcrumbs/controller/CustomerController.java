@@ -66,13 +66,97 @@ public class CustomerController {
         Customer customer = new Customer(
                 nextId, name, email, phone);
 
-        customerService.registerCustomer(customer);
+        try {
+            customerService.registerCustomer(customer);
 
-        redirectAttributes.addFlashAttribute(
-                "message",
-                "Customer registered successfully!");
+            redirectAttributes.addFlashAttribute(
+                    "message",
+                    "Customer registered successfully!"
+            );
+
+            return "redirect:/customers";
+
+        } catch (IllegalArgumentException e) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "This email is already registered. Please use another email."
+            );
+
+            return "redirect:/customers/new";
+        }
+    }
+
+
+    // Open the edit form for an existing customer
+    @GetMapping("/customers/edit")
+    public String editCustomer(
+            @RequestParam int id,
+            Model model) throws IOException {
+
+        List<Customer> customers =
+                customerService.getAllCustomers();
+
+        Customer customer = customers.stream()
+                .filter(c -> c.getId() == id)
+                .findFirst()
+                .orElse(null);
+
+        if (customer == null) {
+            return "redirect:/customers";
+        }
+
+        model.addAttribute("customer", customer);
+
+        return "customer-edit";
+    }
+
+    // Save the updated customer details
+    @PostMapping("/customers/update")
+    public String updateCustomer(
+            @RequestParam int id,
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam String phone,
+            RedirectAttributes redirectAttributes)
+            throws IOException {
+
+        Customer customer = new Customer(
+                id, name, email, phone);
+
+        try {
+            customerService.updateCustomer(customer);
+
+            redirectAttributes.addFlashAttribute(
+                    "message",
+                    "Customer updated successfully!");
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage());
+
+            return "redirect:/customers/edit?id=" + id;
+        }
 
         return "redirect:/customers";
     }
+
+    // Delete a customer
+    @PostMapping("/customers/delete")
+    public String deleteCustomer(
+            @RequestParam int id,
+            RedirectAttributes redirectAttributes)
+            throws IOException {
+
+        customerService.deleteCustomer(id);
+
+        redirectAttributes.addFlashAttribute(
+                "message",
+                "Customer deleted successfully!");
+
+        return "redirect:/customers";
+    }
+
 }
 
